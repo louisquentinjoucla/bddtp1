@@ -1,28 +1,56 @@
 const cheerio = require('cheerio');
-const request = require('request')
+const request = require('request-promise')
+const fs = require('fs')
 
-let id = 1;
-let URL=`http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`
+let spells = [];
+const URLS = [];
 
-let page;
+console.log('\x1b[34m%s\x1b[0m','+---------------------------+');
+console.log('\x1b[35m%s\x1b[0m','| Welcome to PROLOCRAWL 3.0 |');
+console.log('\x1b[34m%s\x1b[0m','+---------------------------+\n');
 
-request(URL, function (error, response, html) {
-  if (!error && response.statusCode == 200) {
-    page = html;
+console.log('\x1b[5m%s\x1b[0m','Mapping all the urls...');
 
-    let $ = cheerio.load(page);
-    let spell = {
-        name: $('.SpellDiv .heading').text(),
-        is_wizard: is_wizard_spell($('.SpellDiv .SPDet').children()['1'].next.data),
-        level: get_level($('.SpellDiv .SPDet').children()['1'].next.data),
-        resistance: get_resistance($('.SpellDiv .SPDet').children()['8'].next.data),
-        components: get_components($('.SpellDiv .SPDet').children()['3'].next.data),
-        description: $('.SPDesc').text()
+for(let id=1; id<1500; id++) {
+    let url = `http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`;
+    URLS.push(url)
+}
+let promises = URLS.map(url => proceedRequest(url));
+
+console.log('\n\x1b[5m%s\x1b[0m', 'Starting to scrap the spells...');
+
+Promise.all(promises).then(function(data){
+    console.log('\n\x1b[32m%s\x1b[0m', 'Success !');
+    console.log('\n\x1b[5m%s\x1b[0m', 'Writing spells to spells/spells.json...');
+    if(!fs.existsSync('../spells')){
+        fs.mkdirSync('../spells');
     }
-
-    console.log(spell);
-  }
+    fs.writeFileSync('../spells/spells.json', JSON.stringify(spells));
+    console.log('\n\x1b[32m%s\x1b[0m', 'Done ! HF with spark !');
+}, function(error){
+    console.log('\n\x1b[31m%s\x1b[0m', error);
 });
+
+//proceedRequest('http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=49');
+
+async function proceedRequest(url) {
+    return request(url).then(function(html){
+        return new Promise(function (resolve,reject) {
+            let $ = cheerio.load(html);
+            
+            let spell = {
+                name: $('.SpellDiv .heading').text(),
+                is_wizard: is_wizard_spell($('.SpellDiv .SPDet').children()['1'].next.data),
+                level: get_level($('.SpellDiv .SPDet').children()['1'].next.data),
+                resistance: get_resistance($('.SpellDiv .SPDet').text()),
+                components: get_components($('.SpellDiv .SPDet').children()['3'].next.data),
+                description: $('.SPDesc').text()
+            }
+            resolve(spells.push(spell));
+        });
+    });
+
+}
 
 function get_level(str_level) {
     const regex_wizard = /sorcerer\/wizard [1-9]/gm;
@@ -37,7 +65,8 @@ function get_level(str_level) {
 }
 
 function get_resistance(str_res) {
-    return str_res === ' no' ? false : true;
+    const regex_spell = /Spell Resistance yes/gm;
+    return regex_spell.test(str_res) ? true : false;
 }
 
 function is_wizard_spell(str_spell){
@@ -49,7 +78,10 @@ function get_components(str_compo) {
     let raw_components = str_compo.split(',');
     let components = [];
     raw_components.forEach(function(item){
-        components.push(item.match(regex_compo)[0]);
+        let matchs = item.match(regex_compo);
+        if(matchs !== null){
+            components.push(matchs[0]);
+        }
     });
     return components;
 }
