@@ -5,49 +5,85 @@ const fs = require('fs')
 let spells = [];
 const URLS = [];
 
-console.log('\x1b[34m%s\x1b[0m','+---------------------------+');
-console.log('\x1b[35m%s\x1b[0m','| Welcome to PROLOCRAWL 3.0 |');
-console.log('\x1b[34m%s\x1b[0m','+---------------------------+\n');
+console.log('\t\t\x1b[34m%s\x1b[0m','+---------------------------+');
+console.log('\t\t\x1b[35m%s\x1b[0m','| Welcome to PROLOCRAWL 3.0 |');
+console.log('\t\t\x1b[34m%s\x1b[0m','+---------------------------+\n');
+crawl_all();
 
-console.log('\x1b[5m%s\x1b[0m','Mapping all the urls...');
 
-for(let id=1; id<100; id++) {
-    let url = `http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`;
-    URLS.push(url)
-}
-let promises = URLS.map(url => proceedRequest(url));
+async function crawl_all(){
+    console.log('\n\x1b[5m%s\x1b[0m', 'Starting to scrap the spells...');
 
-console.log('\n\x1b[5m%s\x1b[0m', 'Starting to scrap the spells...');
+    for(let id=1; id<=1975; id++) {
+        let url = `http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`;
+        await proceedRequest(url,id);
+    }
 
-Promise.all(promises).then(function(data){
     console.log('\n\x1b[32m%s\x1b[0m', 'Success !');
-    console.log('\n\x1b[5m%s\x1b[0m', 'Writing spells to spells/spells.json...');
+    console.log('\n\x1b[5m%s\x1b[0m', `Writing ${spells.length} spells to spells/spells.json...`);
     if(!fs.existsSync('../spells')){
         fs.mkdirSync('../spells');
     }
-    fs.writeFileSync('../spells/spells.json', JSON.stringify(spells));
-    console.log('\n\x1b[32m%s\x1b[0m', 'Done ! HF with spark !');
-}, function(error){
-    console.log('\n\x1b[31m%s\x1b[0m', error);
-});
 
-async function proceedRequest(url) {
+    await fs.writeFile('../spells/spells.json', JSON.stringify(spells), function(err) {
+        if (err) {
+            console.log('\n\x1b[31m%s\x1b[0m', err);
+        } else {
+            console.log('\n\x1b[32m%s\x1b[0m', 'Done ! HF with spark !');
+        }
+    });
+    
+}
+
+//console.log('\x1b[5m%s\x1b[0m','Mapping all the urls...');
+
+// for(let id=1; id<100; id++) {
+//     let url = `http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`;
+//     //URLS.push(url)
+//     await proceedRequest(url);
+// }
+
+
+// let promises = URLS.map(url => proceedRequest(url));
+
+// console.log('\n\x1b[5m%s\x1b[0m', 'Starting to scrap the spells...');
+
+// Promise.all(promises).then(function(data){
+//     console.log('\n\x1b[32m%s\x1b[0m', 'Success !');
+//     console.log('\n\x1b[5m%s\x1b[0m', 'Writing spells to spells/spells.json...');
+//     if(!fs.existsSync('../spells')){
+//         fs.mkdirSync('../spells');
+//     }
+//     fs.writeFileSync('../spells/spells.json', JSON.stringify(spells));
+//     console.log('\n\x1b[32m%s\x1b[0m', 'Done ! HF with spark !');
+// }, function(error){
+//     console.log('\n\x1b[31m%s\x1b[0m', error);
+// });
+
+async function proceedRequest(url,i) {
     return request(url).then(function(html){
         return new Promise(function (resolve,reject) {
             let $ = cheerio.load(html);
-            
+            if($('.SpellDiv .heading').text() === "") {
+                console.log('\n\x1b[33m%s\x1b[0m', `INFO SGBD ${i}: Empty URL ` + url);
+                resolve();
+            }
             let spell = {
                 name: $('.SpellDiv .heading').text(),
                 is_wizard: is_wizard_spell($('.SpellDiv .SPDet').children()['1'].next.data),
-                level: parseInt(get_level($('.SpellDiv .SPDet').children()['1'].next.data)) || 0,
+                level: parseInt(get_level($('.SpellDiv .SPDet').children()['1'].next.data)),
                 resistance: get_resistance($('.SpellDiv .SPDet').text()),
                 components: get_components($('.SpellDiv .SPDet').children()['3'].next.data),
                 description: $('.SPDesc').text()
             }
+            let color = (i % 2 == 0) ? '\n\x1b[94m%s\x1b[0m' : '\n\x1b[1m%s\x1b[0m';
+            console.log(color, `Name: ${(spell.name+" ".repeat(30)).substr(0, 30)} | Wizard: ${(spell.is_wizard+" ".repeat(10)).substr(0, 7)}| level: ${spell.level} | resistance: ${(spell.resistance+" ".repeat(10)).substr(0, 7)}| Components: ${(spell.components+" ".repeat(20)).substr(0, 10)} |`);
             resolve(spells.push(spell));
+        }, function(){
+            console.log('\n\x1b[31m%s\x1b[0m', "Error for url " + url);
         });
     });
-
+    
 }
 
 function get_level(str_level) {
