@@ -11,7 +11,7 @@ console.log('\x1b[34m%s\x1b[0m','+---------------------------+\n');
 
 console.log('\x1b[5m%s\x1b[0m','Mapping all the urls...');
 
-for(let id=1; id<1500; id++) {
+for(let id=1; id<100; id++) {
     let url = `http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`;
     URLS.push(url)
 }
@@ -31,8 +31,6 @@ Promise.all(promises).then(function(data){
     console.log('\n\x1b[31m%s\x1b[0m', error);
 });
 
-//proceedRequest('http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=49');
-
 async function proceedRequest(url) {
     return request(url).then(function(html){
         return new Promise(function (resolve,reject) {
@@ -41,7 +39,7 @@ async function proceedRequest(url) {
             let spell = {
                 name: $('.SpellDiv .heading').text(),
                 is_wizard: is_wizard_spell($('.SpellDiv .SPDet').children()['1'].next.data),
-                level: get_level($('.SpellDiv .SPDet').children()['1'].next.data),
+                level: parseInt(get_level($('.SpellDiv .SPDet').children()['1'].next.data)) || 0,
                 resistance: get_resistance($('.SpellDiv .SPDet').text()),
                 components: get_components($('.SpellDiv .SPDet').children()['3'].next.data),
                 description: $('.SPDesc').text()
@@ -53,8 +51,8 @@ async function proceedRequest(url) {
 }
 
 function get_level(str_level) {
-    const regex_wizard = /sorcerer\/wizard [1-9]/gm;
-    const regex_others = /[1-9]+/gm;
+    const regex_wizard = /sorcerer\/wizard [0-9]/gm;
+    const regex_others = /[0-9]+/gm;
     
     if(regex_wizard.test(str_level)) {
         const chunk = str_level.match(regex_wizard)[0]; 
