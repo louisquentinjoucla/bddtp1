@@ -31,7 +31,7 @@ object SpellsFinder {
 		item(2) == true && item(3).toString.toInt <= 4 && compos.length == 1 && compos(0) == "V"
 	})
 
-	println("Spells that PITO can use, are :")
+	println("\nSpells that PITO can use, are :")
 
 	// Printing the available spells for pito
 	spellsRDDFilter.foreach((item) => { 

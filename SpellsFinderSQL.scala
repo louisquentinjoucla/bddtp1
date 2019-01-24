@@ -27,7 +27,6 @@ object SpellsFinderSQL {
 
     // Importing external json dataset
     val spellsDF = ss.read.option("multiLine", "true").json("./spells/spells.json")
-    spellsDF.select("name").show(false)
 
     // Filtering all the spells
     val spellsDFFilter = spellsDF.filter(spellsDF("is_wizard") === true 
@@ -35,8 +34,8 @@ object SpellsFinderSQL {
                           && size(spellsDF("components")) === 1
                           && spellsDF("components")(0).contains("V"))
 
-    println("Spells that PITO can use, are :")
-    spellsDFFilter.select(($"name")).show
+    println("\nSpells that PITO can use, are :")
+    spellsDFFilter.select(($"name")).show(spellsDFFilter.count.toInt,false)
     sc.stop
   }
 }
