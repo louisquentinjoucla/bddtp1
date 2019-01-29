@@ -35,12 +35,11 @@ async function crawl_all(){
     
 }
 
-//console.log('\x1b[5m%s\x1b[0m','Mapping all the urls...');
+// console.log('\x1b[5m%s\x1b[0m','Mapping all the urls...');
 
 // for(let id=1; id<100; id++) {
 //     let url = `http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=${id}`;
-//     //URLS.push(url)
-//     await proceedRequest(url);
+//     URLS.push(url)
 // }
 
 
@@ -68,8 +67,9 @@ async function proceedRequest(url,i) {
                 console.log('\n\x1b[33m%s\x1b[0m', `INFO SGBD ${i}: Empty URL ` + url);
                 resolve();
             }
+
             let spell = {
-                name: $('.SpellDiv .heading').text(),
+                name: $('.SpellDiv .heading').children()['0'].children[0].data,
                 is_wizard: is_wizard_spell($('.SpellDiv .SPDet').children()['1'].next.data),
                 level: parseInt(get_level($('.SpellDiv .SPDet').children()['1'].next.data)),
                 resistance: get_resistance($('.SpellDiv .SPDet').text()),
