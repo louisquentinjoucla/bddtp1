@@ -30,9 +30,10 @@ Pour crawler plusieurs pages, j'ai eu **deux approches** ! Oui oui, deux car la 
 
 La première approche fonctionné de la façon suivante:
 
-Vue que l'on travaille en asynchrone, on travaille avec des promesses, il fallait donc les chaîner, la première idée qui m'est venu, était de crée une liste d'URL puis de mapper cette liste avec la fonction proceedRequest. Puis une fois que toutes les promesses était résolu, d'écrire dans un fichier JSON la liste des spells.
+Vue que l'on travaille en asynchrone, on travaille avec des promesses, il fallait donc les chaîner, la première idée qui m'est venu, était de crée une liste d'URL puis de mapper cette liste avec la fonction proceedRequest. Puis une fois que toutes les promesses étaient résolus, d'écrire dans un fichier JSON la liste des spells.
 
-Voici le code: 
+Voici le code:
+
 ![code approche 1](https://i.imgur.com/KZwIn5d.png)
 
 On se dit, c'est bon, tout va fonctionner:
@@ -53,6 +54,45 @@ Au final on crawl parmis les 1975 pages sur le sites, 1973 car deux pages sont v
 
 
 ### Filter de la BDD avec Spark:
+
+#### Avec RDD:
+On crée un RDD à l'aide de notre fichier JSON. Puis on applique un filtre. 
+
+Voici le code correspondant:
+
+![spark filter code rdd](https://imgur.com/a/tLh7qwU)
+
+Voici le résultat d'éxecution:
+
+![spark_filter_exec_rdd](https://i.imgur.com/o3c3Daq.png)
+
+#### Avec un dataframe:
+
+On crée un dataframe à l'aide de notre fichier JSON. Puis on applique un filtre:
+
+Voici le code correspondant:
+
+![spark_filter_code_sql](https://i.imgur.com/GQzx9Ll.png)
+
+Voici le résultat d'éxecution:
+
+![spark_filter_exec_sql](https://i.imgur.com/mEAZPec.png)
+
+
+## Exercice 2
+
+On doit réaliser un pagerank avec le graph suivant:
+
+![Graph exercice 2](https://i.imgur.com/DvlqzdB.png)
+
+On crée une class Page:
+
+![Class page](https://i.imgur.com/ygyuIxH.png)
+
+Puis on crée un graph en faisant une instance de cette classe par page, on le stocke ensuite dans un RDD:
+
+![Graph](https://i.imgur.com/xsKAfXr.png)
+
 
 
 
