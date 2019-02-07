@@ -100,14 +100,14 @@ Puis on crée un graph en faisant une instance de cette classe par page, on le s
 On va maintenant appliquer l'algorithme Pagerank sous Spark. Pour cela on va lister les étapes de ce que l'on doit faire:
 
 1. Initialisation :
-  * Pour chaque page initialiser le pagerank à 1. On la met sous la forme de pair (url, pagerank).
-  * Pour chaque page crée une pair (url, adj_list). Cela nous permettra de calculer les contributions.
-  * Pour chaque page, on crée une pair (url, 0). Cela nous permet que si une page n'a pas de contribution, lors du reduce, de quand même pouvoir calculer la valeur de la page. Ici c'est utile pour la page D. On appelle cette map **pages**.
+   * Pour chaque page initialiser le pagerank à 1. On la met sous la forme de pair (url, pagerank).
+   * Pour chaque page crée une pair (url, adj_list). Cela nous permettra de calculer les contributions.
+   * Pour chaque page, on crée une pair (url, 0). Cela nous permet que si une page n'a pas de contribution, lors du reduce, de quand même pouvoir calculer la valeur de la page. Ici c'est utile pour la page D. On appelle cette map **pages**.
 2. On boucle. Pour chaque itération:
-  *  Pour chaque url dans chaque adj_list des pages du graph, on crée une pair (url, rank / taille_adj_list). Le rank étant le pagerank de l'itération précédente ou de l'initialisation. On appelle cette map **outlink**.
-  *  On fait l'union de la map **pages** et **outlink**. On appelle cette map **contribs**
-  *  On reduce la map **contribs**. Pour chaque pair (url, pr), on regroupe les pair qui ont la même url en faisant la somme de leur pr.
-  *  On map le reduce de l'étape précédente en remplaçant chaque pair (url, pr), par (url, (1 -d) + d * pr). On considére alors que ce sont nos nouvelles valeurs de pagerank pour chaque url.
+   *  Pour chaque url dans chaque adj_list des pages du graph, on crée une pair (url, rank / taille_adj_list). Le rank étant le pagerank de l'itération précédente ou de l'initialisation. On appelle cette map **outlink**.
+   *  On fait l'union de la map **pages** et **outlink**. On appelle cette map **contribs**
+   *  On reduce la map **contribs**. Pour chaque pair (url, pr), on regroupe les pair qui ont la même url en faisant la somme de leur pr.
+   *  On map le reduce de l'étape précédente en remplaçant chaque pair (url, pr), par (url, (1 -d) + d * pr). On considére alors que ce sont nos nouvelles valeurs de pagerank pour chaque url.
   
 Voici le code correspondant:
 
