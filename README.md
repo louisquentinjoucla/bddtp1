@@ -60,7 +60,7 @@ On crée un RDD à l'aide de notre fichier JSON. Puis on applique un filtre.
 
 Voici le code correspondant:
 
-![spark filter code rdd](https://imgur.com/a/tLh7qwU)
+![spark filter code rdd](https://i.imgur.com/NwdUqik.png)
 
 Voici le résultat d'éxecution:
 
@@ -81,6 +81,8 @@ Voici le résultat d'éxecution:
 
 ## Exercice 2
 
+### Creation du graph
+
 On doit réaliser un pagerank avec le graph suivant:
 
 ![Graph exercice 2](https://i.imgur.com/DvlqzdB.png)
@@ -93,6 +95,30 @@ Puis on crée un graph en faisant une instance de cette classe par page, on le s
 
 ![Graph](https://i.imgur.com/xsKAfXr.png)
 
+### Pagerank
 
+On va maintenant appliquer l'algorithme Pagerank sous Spark. Pour cela on va lister les étapes de ce que l'on doit faire:
 
+1. Initialisation :
+  * Pour chaque page initialiser le pagerank à 1. On la met sous la forme de pair (url, pagerank).
+  * Pour chaque page crée une pair (url, adj_list). Cela nous permettra de calculer les contributions.
+  * Pour chaque page, on crée une pair (url, 0). Cela nous permet que si une page n'a pas de contribution, lors du reduce, de quand même pouvoir calculer la valeur de la page. Ici c'est utile pour la page D. On appelle cette map **pages**.
+2. On boucle. Pour chaque itération:
+  *  Pour chaque url dans chaque adj_list des pages du graph, on crée une pair (url, rank / taille_adj_list). Le rank étant le pagerank de l'itération précédente ou de l'initialisation. On appelle cette map **outlink**.
+  *  On fait l'union de la map **pages** et **outlink**. On appelle cette map **contribs**
+  *  On reduce la map **contribs**. Pour chaque pair (url, pr), on regroupe les pair qui ont la même url en faisant la somme de leur pr.
+  *  On map le reduce de l'étape précédente en remplaçant chaque pair (url, pr), par (url, (1 -d) + d * pr). On considére alors que ce sont nos nouvelles valeurs de pagerank pour chaque url.
+  
+Voici le code correspondant:
 
+![code pagerank](https://i.imgur.com/RkcN9sR.png)
+
+Voici le résultat d'éxecution:
+
+![exec pagerank](https://i.imgur.com/A0yuhcC.png)
+
+## Conclusion:
+
+Le plus dur dans ce TP, c'est pas Spark. C'est l'installation de Spark sous Windows et la notation Scala qui est un peu barbare parfois.
+
+![scala_syntaxe](https://i.imgflip.com/12llwx.jpg)
