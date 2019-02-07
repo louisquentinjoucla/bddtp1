@@ -50,6 +50,8 @@ Mais bon, j'ai mis des console log en couleurs du coups c'est joli.
 
 ![log crawling](https://i.imgur.com/lGHT8de.png)
 
+*A note que sur cette image, le crawler n'était pas fini correctement, on peut voir des répétitions dans le nom à cause des sorts qui pouvait être mythique. C'est réglé, j'ai juste pas envie de relancer le programme pour reprendre un screen.*
+
 Au final on crawl parmis les 1975 pages sur le sites, 1973 car deux pages sont vides.
 
 
