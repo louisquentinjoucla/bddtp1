@@ -39,7 +39,7 @@ Voici le code:
 On se dit que c'est bon, tout va fonctionner:
 ![It's free real estate](https://i.kym-cdn.com/entries/icons/original/000/021/311/free.jpg)
 
-Mais à mon grand désarroi, en fonction du nombres de requête, je provoquais des mini coupures du sites:
+Mais à mon grand désarroi, en fonction du nombres de requête, je provoquais des mini coupures du site:
 ![Erreur 503 dxcontent](https://media.discordapp.net/attachments/509134129779179531/537452878626029578/unknown.png)
 
 Du coup, pour éviter de refaire planter le site, j'ai décidé de faire requête par requête dans une boucle (cf fonction crawl_all). C'est plus long et plate mais ça marche. 
@@ -52,7 +52,7 @@ Mais bon, j'ai mis des console log en couleurs du coups c'est joli.
 
 *A note que sur cette image, le crawler n'était pas fini correctement, on peut voir des répétitions dans le nom à cause des sorts qui pouvait être mythique. C'est réglé, j'ai juste pas envie de relancer le programme pour reprendre un screen.*
 
-Au final on crawl parmis les 1975 pages sur le sites, 1973 car deux pages sont vides.
+Au final on crawl parmis les 1975 pages sur le site, 1973 car deux pages sont vides.
 
 
 ### Filter de la BDD avec Spark:
